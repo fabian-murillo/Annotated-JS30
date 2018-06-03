@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<h1>Click and drag the mouse anywhere on the page!</h1>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+// Grab the canvas element:
+const canvas = document.querySelector('#draw');
+// We 'draw' on the context, either 2d or 3d
+// So we grab the context:
+const ctx = canvas.getContext('2d');
+// Next, we size up the canvas to be the exact width of the window:
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+// We handle a couple of the base settings:
+ctx.strokeStyle = 'red'; // Sets the color
+ctx.lineJoin = 'round'; // The end of the line, or when the line meets another line, should it be squared off? or rounded?
+ctx.lineCap = 'round';
+ctx.lineWidth = 100;
+
+// dummy variables:
+let isDrawing = false; // this is our flag, it'll keep track of whether or not the mouse is being clicked down (we're drawing)
+// When we draw to a canvas, we need a starting point and an endpoint, to draw 
+let lastX = 0;
+let lastY = 0;
+let hue = 0;
+let direction = true;
+// Draw is called whenever the mouse is moved aboeve the canvas
+function draw(e) {
+if(!isDrawing) return; // stops fn from running when they are not moused down
+
+console.log(e);
+// Start a path from:
+ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`
+ctx.beginPath();
+// Start with an x & y:
+ctx.moveTo(lastX, lastY);
+// Go to:
+ctx.lineTo(e.offsetX, e.offsetY)
+ctx.stroke();
+// Update lastX & lastY vars:
+// lastX = e.offsetX;
+// lastY = e.offsetY;
+[lastX, lastY] = [e.offsetX, e.offsetY]; // ES6 destructuring an array
+hue++; // Changes the color (Hue)
+if (hue >= 360){ // Resets the Hue
+  hue = 0;
+}
+if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+  direction = !direction;
+}
+if (direction) {
+  ctx.lineWidth++;
+} else {
+  ctx.lineWidth--;
+}
+
+
+
+}
+// Listen for our 'mousemove' event on the canvas:
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  //As soon as someone clicks donw on the mouse, update lastX and lastY 
+  //(this is what keeps us from starting at 0 each time we start to draw)
+  [lastX, lastY] = [e.offsetX, e.offsetY]; 
+});
+
+
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', () => isDrawing = false);
+// Mousout is for cases where you clicked down, dragged the mouse off the canvas, then mouseup'd, (it wouldn't know you mouseup'd off the canvas context)
+canvas.addEventListener('mouseout', () => isDrawing = false);
+
+
+
+
+
+</script>
+
+<style>
+  html, body {
+    margin:0;
+  }
+</style>
+
+</body>
+</html>
